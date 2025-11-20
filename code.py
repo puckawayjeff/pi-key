@@ -3,7 +3,7 @@
 Features:
 - Double-press: Types macro string from macro.txt file
 - Long-press (1+ sec): Activates keep-alive mode (prevents screen lock)
-- Keep-alive: Alternates Space and Left-Arrow keypresses every 600ms
+- Keep-alive: Alternates Space and Left-Arrow keypresses at random intervals
 - Visual feedback via WS2812 RGB LED
 """
 import time
@@ -11,6 +11,7 @@ import board
 import digitalio
 import usb_hid
 import neopixel
+import random
 from adafruit_hid.keyboard import Keyboard
 from adafruit_hid.keycode import Keycode
 from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS
@@ -23,7 +24,8 @@ MACRO_FILE = "macro.txt"  # Text file containing string to type
 # --- Timing Constants (in seconds) ---
 DOUBLE_PRESS_GAP = 0.3  # Max time between clicks for double-press
 LONG_PRESS_DURATION = 1.0  # Hold duration to trigger keep-alive
-KEEP_ALIVE_MIN = 0.6  # Interval between keep-alive keystrokes
+KEEP_ALIVE_MIN = 0.8  # Minimum interval between keep-alive keystrokes
+KEEP_ALIVE_MAX = 2.0  # Maximum interval between keep-alive keystrokes
 
 # --- Load Macro String from File ---
 try:
@@ -62,6 +64,7 @@ last_click_time = 0  # Time of last click
 keep_alive_active = False  # Is keep-alive mode active?
 last_keep_alive_time = 0  # Last time we sent a keystroke
 keep_alive_toggle = False  # Alternate between space and arrow
+next_keep_alive_delay = 0  # Randomized delay for next keystroke
 
 # --- LED Breathing Animation State ---
 breathe_brightness = 0  # Current brightness (0-127)
@@ -181,6 +184,9 @@ while True:
                 print("Long press - activating keep-alive")
                 keep_alive_active = True
                 last_keep_alive_time = current_time
+                # Set initial random delay
+                next_keep_alive_delay = random.uniform(KEEP_ALIVE_MIN,
+                                                       KEEP_ALIVE_MAX)
                 click_count = 0  # Clear pending clicks
     
     # Double-press detection: check if timeout expired
@@ -192,14 +198,17 @@ while True:
             layout.write(MACRO_STRING)
         click_count = 0  # Reset for next detection
     
-    # Keep-alive: send alternating keystrokes
+    # Keep-alive: send alternating keystrokes at random intervals
     if (keep_alive_active and
-            (current_time - last_keep_alive_time) > KEEP_ALIVE_MIN):
+            (current_time - last_keep_alive_time) > next_keep_alive_delay):
         if keep_alive_toggle:
             kbd.send(Keycode.LEFT_ARROW)
         else:
             kbd.send(Keycode.SPACE)
         keep_alive_toggle = not keep_alive_toggle
         last_keep_alive_time = current_time
+        # Generate next random delay (0.8-2.0 seconds)
+        next_keep_alive_delay = random.uniform(KEEP_ALIVE_MIN,
+                                               KEEP_ALIVE_MAX)
     
     time.sleep(0.01)  # Poll at 100Hz
