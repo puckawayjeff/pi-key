@@ -15,6 +15,26 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types ke
 - **Button**: Momentary pushbutton between GP29 and GND (internal pull-up)
 - **LED**: Onboard WS2812 RGB LED on GP16 (GRB color order)
 
+## Stealth Mode
+
+The device operates in **stealth mode** by default:
+- No USB drive appears
+- No serial console port
+- Appears as "Dell KB216 Wired Keyboard" to the host
+- Code runs automatically on power-up
+
+### Entering Edit Mode
+
+To access the CIRCUITPY drive for editing:
+
+1. **Unplug** the device
+2. **Hold** the button (GP29) down
+3. **Plug in** the device while holding the button
+4. **Release** the button after 1 second
+5. The CIRCUITPY drive will appear normally
+
+This is controlled by `boot.py` which checks the button state at boot time.
+
 ## Quick Start
 
 ### 1. Install CircuitPython
@@ -33,9 +53,12 @@ ls /media/jeff/CIRCUITPY/lib/
 
 ### 3. Deploy Code
 
+**First time or when in edit mode:**
 ```bash
-./deploy.sh  # Copies code.py and macro.txt to device
+./deploy.sh  # Copies code.py, boot.py, and macro.txt to device
 ```
+
+**Note**: After first deployment with `boot.py`, you must use edit mode (hold button during boot) to access the drive for updates.
 
 ### 4. Customize Macro
 
@@ -65,6 +88,7 @@ Edit `macro.txt` to change the string that gets typed on double-press, then rede
 
 ```
 code.py          # Main firmware (CircuitPython)
+boot.py          # Boot-time config (enables stealth mode)
 macro.txt        # String to type on double-press
 deploy.sh        # Deployment helper
 monitor.sh       # Serial console monitor
@@ -83,3 +107,12 @@ archive/         # Historical Arduino experiments
 - **GP16**: WS2812 LED (GRB color order, not RGB!)
 - **GP29**: Button input with internal pull-up (active-low)
 - Button wiring: GP29 → momentary switch → GND
+
+## Stealth Mode Details
+
+The `boot.py` file configures USB behavior at boot time:
+
+- **Normal operation** (button not pressed): USB drive and serial console disabled, device appears as generic keyboard
+- **Edit mode** (button pressed during boot): Full CIRCUITPY drive access enabled
+
+This allows the device to operate covertly while still being field-updatable without requiring BOOTSEL mode.

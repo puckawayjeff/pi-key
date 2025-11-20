@@ -5,7 +5,10 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Single-b
 
 ## Architecture
 - **Platform**: CircuitPython 9.x on Waveshare RP2040-One
-- **Main file**: `code.py` (deployed to CIRCUITPY USB drive at `/media/jeff/CIRCUITPY`)
+- **Main files**: 
+  - `code.py` - Main application logic
+  - `boot.py` - Boot-time USB configuration (stealth mode)
+- **USB Behavior**: Device operates in stealth mode by default (no drive, no serial port)
 - **Hardware**: 
   - Button: GP29 with internal pull-up (active-low)
   - RGB LED: GP16 WS2812 (GRB color order, NOT RGB!)
@@ -13,13 +16,22 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Single-b
 
 ## Development Workflow
 
+### Entering Edit Mode
+Device runs in stealth mode (no USB drive) by default. To edit:
+1. Unplug device
+2. Hold button (GP29)
+3. Plug in while holding button
+4. Release after 1 second
+5. CIRCUITPY drive appears at `/media/jeff/CIRCUITPY`
+
 ### Deploy Code
 ```bash
-./deploy.sh  # Copies code.py to /media/jeff/CIRCUITPY
+./deploy.sh  # Copies code.py, boot.py, macro.txt to device
 ```
 Device auto-reloads immediately after file copy. No compilation needed.
 
 ### Monitor Console
+**Note**: Serial console only available in edit mode (button held during boot).
 ```bash
 ./monitor.sh  # Connects to /dev/ttyACM0 serial console
 ```
@@ -152,7 +164,15 @@ Run `./monitor.sh` before deploying code to see boot messages and runtime output
 - **File copy fails**: Ensure device is not write-protected
 
 ## Code Structure
-- Keep all code in single `code.py` file for simplicity
+
+### boot.py
+- Runs FIRST at power-on (before `code.py`)
+- Checks button state to enable/disable USB drive and serial console
+- Button pressed = edit mode (drive visible), released = stealth mode (drive hidden)
+- Critical for field deployment without exposing device internals
+
+### code.py
+- Main application logic (runs after `boot.py`)
 - Configuration constants at top of file
 - Hardware setup before main loop
 - Main loop must never exit (infinite `while True:`)
