@@ -1,0 +1,38 @@
+# pi-key Configuration File
+# Edit this file to customize device behavior without modifying Python code
+# Lines starting with # are comments and will be ignored
+
+# === USB Device Settings (Stealth Mode) ===
+# Choose a preset or set 'custom' to define your own values
+# Available presets: dell_kb216, logitech_k120, hp_km100, microsoft_600, apple_keyboard
+usb_preset: dell_kb216
+
+# Custom USB settings (only used when usb_preset is 'custom')
+# usb_manufacturer: My Custom Manufacturer
+# usb_product: My Custom Keyboard
+# usb_vid: 0x1234
+# usb_pid: 0x5678
+
+# === Timing Settings (in seconds) ===
+# Time window for detecting double-press
+double_press_gap: 0.5
+
+# How long to hold button to activate keep-alive
+long_press_duration: 1.0
+
+# Random interval between keep-alive keystrokes
+keep_alive_min: 0.8
+keep_alive_max: 2.0
+
+# === LED Colors ===
+# Colors can be hex codes (e.g., #FF00FF) or named colors
+# Available named colors: red, green, blue, yellow, cyan, magenta, white, amber, purple, orange
+
+# Color for macro typing confirmation flash
+macro_color: purple
+
+# Color for keep-alive mode breathing animation
+keepalive_color: amber
+
+# Color for keep-alive exit flash
+cancel_color: red

@@ -8,8 +8,9 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types ke
 
 - **Double-Press**: Types customizable macro string (from `macro.txt`)
 - **Long-Press** (1+ second): Activates keep-alive mode  
-- **Keep-Alive Mode**: Alternates Space/Left-Arrow every 600ms to prevent screen lock
-- **Visual Feedback**: RGB LED indicates actions (purple=typing, amber=keep-alive, red=exit)
+- **Keep-Alive Mode**: Sends programmable keystroke sequence (from `keepalive.txt`) at random intervals to prevent screen lock
+- **Visual Feedback**: RGB LED indicates actions (colors configurable)
+- **Fully Configurable**: Timing, colors, and USB device identity customizable via `config.yaml`
 
 ## Hardware
 
@@ -19,12 +20,43 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types ke
 - **Button**: Momentary pushbutton between GP29 and GND (internal pull-up)
 - **LED**: Onboard WS2812 RGB LED on GP16 (GRB color order)
 
+## Configuration
+
+The device is fully configurable without modifying any Python code. All settings are in text files:
+
+### config.yaml
+
+Controls device behavior and appearance:
+
+**USB Device Identity (Stealth Mode)**
+- Choose from preset keyboards: `dell_kb216` (default), `logitech_k120`, `hp_km100`, `microsoft_600`, `apple_keyboard`
+- Or set `usb_preset: custom` and define your own manufacturer, product, VID, and PID
+
+**Timing Settings**
+- `double_press_gap`: Time window for double-press detection (default: 0.5s)
+- `long_press_duration`: Hold time to activate keep-alive (default: 1.0s)
+- `keep_alive_min` / `keep_alive_max`: Random interval between keep-alive keystrokes (default: 0.8-2.0s)
+
+**LED Colors**
+- `macro_color`: Color for macro typing flash (default: purple)
+- `keepalive_color`: Color for keep-alive breathing (default: amber)
+- `cancel_color`: Color for keep-alive exit flash (default: red)
+- Colors can be hex codes (e.g., `#FF00FF`) or named colors (`red`, `green`, `blue`, `yellow`, `cyan`, `magenta`, `white`, `purple`, `amber`, `orange`)
+
+### macro.txt
+
+The string to type when you double-press the button. Supports plain text and special key syntax (see Macro Syntax below).
+
+### keepalive.txt
+
+The keystroke sequence to send repeatedly during keep-alive mode. Uses the same syntax as `macro.txt`. Default is `{SPACE}{LEFT_ARROW}` which types Space then Left-Arrow to neutralize cursor movement.
+
 ## Stealth Mode
 
 The device operates in **stealth mode** by default:
 - No USB drive appears
 - No serial console port
-- Appears as "Dell KB216 Wired Keyboard" to the host
+- Appears as a common keyboard to the host (configurable in `config.yaml`)
 - Code runs automatically on power-up
 
 ### Entering Edit Mode
@@ -83,26 +115,29 @@ Example: `Python {{dict}}` types `Python {dict}`
 
 ## Quick Start (Users)
 
-If the device is already programmed, you can customize the macro without any programming:
+If the device is already programmed, you can customize it without any programming:
 
-### Edit the Macro
+### Edit Configuration
 
 1. **Unplug** the device
 2. **Hold** the button down
 3. **Plug in** the device while holding
 4. **Release** after 1 second
 5. The `CIRCUITPY` drive will appear
-6. **Edit** `macro.txt` with any text editor
-7. **Save** the file
+6. **Edit** the following files with any text editor:
+   - `macro.txt` - The text to type on double-press
+   - `keepalive.txt` - The keystroke sequence for keep-alive mode
+   - `config.yaml` - Timing, colors, and USB device identity
+7. **Save** the files
 8. **Unplug** the device (or press Ctrl+D in serial console to reload)
 
-The device is now ready with your custom macro!
+The device is now ready with your custom settings!
 
 ### Usage
 
-- **Double-tap button**: Purple flash → Types your macro
-- **Hold button 1+ seconds**: Amber breathing → Keep-alive mode active
-- **Press during keep-alive**: Two red flashes → Exits keep-alive mode
+- **Double-tap button**: Flash (configurable color) → Types your macro
+- **Hold button 1+ seconds**: Breathing LED (configurable color) → Keep-alive mode active
+- **Press during keep-alive**: Two flashes (configurable color) → Exits keep-alive mode
 
 ## Developer Setup
 
@@ -150,8 +185,10 @@ Device needs `adafruit_hid` and `neopixel` in `/lib/` folder:
 
 ```
 code.py          # Main firmware (CircuitPython)
-boot.py          # Boot-time config (enables stealth mode)
+boot.py          # Boot-time config (enables stealth mode, reads USB config)
 macro.txt        # String to type on double-press
+keepalive.txt    # Keystroke sequence for keep-alive mode
+config.yaml      # User configuration (timing, colors, USB identity)
 deploy.sh        # Deployment helper
 monitor.sh       # Serial console monitor
 archive/         # Historical Arduino experiments

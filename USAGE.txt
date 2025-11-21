@@ -9,17 +9,20 @@ QUICK START
 3. Press the button again to exit keep-alive mode
 
 
-EDITING YOUR MACRO
-------------------
-To change what gets typed when you double-tap:
+CUSTOMIZING YOUR DEVICE
+-----------------------
+To change device behavior (macro, keep-alive, timing, colors):
 
 1. UNPLUG the device
 2. HOLD the button down
 3. PLUG IN the device while holding the button
 4. RELEASE the button after 1 second
 5. The CIRCUITPY drive will appear on your computer
-6. Open macro.txt in any text editor
-7. Edit the text and SAVE the file
+6. Edit the configuration files:
+   - macro.txt: Text to type on double-press
+   - keepalive.txt: Keystroke sequence for keep-alive mode
+   - config.yaml: Timing, colors, USB device identity
+7. SAVE the files
 8. UNPLUG the device (it's ready to use!)
 
 
@@ -89,9 +92,55 @@ Navigate and select text:
 
 LED INDICATORS
 --------------
-Purple flash:         Macro is being typed
-Amber breathing:      Keep-alive mode active (types spacebar every 0.8-2.0s)
-Two red flashes:      Keep-alive mode exited
+Color flash:          Macro is being typed (default: purple)
+Breathing LED:        Keep-alive mode active (default: amber)
+Two color flashes:    Keep-alive mode exited (default: red)
+
+Note: LED colors are configurable in config.yaml
+
+
+CONFIGURATION FILE (config.yaml)
+--------------------------------
+The config.yaml file lets you customize device behavior without editing Python code.
+
+TIMING SETTINGS:
+  double_press_gap: 0.5       # Time window for double-press (seconds)
+  long_press_duration: 1.0    # Hold time to activate keep-alive (seconds)
+  keep_alive_min: 0.8         # Minimum interval between keep-alive keys
+  keep_alive_max: 2.0         # Maximum interval between keep-alive keys
+
+LED COLORS (hex codes or named colors):
+  macro_color: purple         # Color for macro typing flash
+  keepalive_color: amber      # Color for keep-alive breathing
+  cancel_color: red           # Color for keep-alive exit flash
+  
+  Available named colors: red, green, blue, yellow, cyan, magenta, 
+                         white, purple, amber, orange
+  Hex code examples: #FF0000 (red), #00FF00 (green), #0000FF (blue)
+
+USB DEVICE IDENTITY (Stealth Mode):
+  usb_preset: dell_kb216      # Choose a preset keyboard
+  
+  Available presets:
+    - dell_kb216 (Dell KB216 Wired Keyboard)
+    - logitech_k120 (Logitech USB Keyboard)
+    - hp_km100 (HP USB Keyboard)
+    - microsoft_600 (Microsoft Wired Keyboard 600)
+    - apple_keyboard (Apple Keyboard)
+    - custom (define your own - see config.yaml for details)
+
+KEEP-ALIVE FILE (keepalive.txt)
+-------------------------------
+The keepalive.txt file defines what keystroke sequence is sent repeatedly
+during keep-alive mode. It uses the same {KEY} syntax as macro.txt.
+
+Default: {SPACE}{LEFT_ARROW}
+  This types Space then Left-Arrow, which neutralizes cursor movement.
+
+Examples:
+  {SPACE}{BACKSPACE}         # Space then backspace (no visible effect)
+  {SHIFT}                    # Just press Shift (minimal impact)
+  {F15}                      # Press F15 key (rarely used key)
 
 
 TROUBLESHOOTING
