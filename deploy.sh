@@ -2,7 +2,7 @@
 # Deploy code.py to the RP2040-One CircuitPython device
 
 MOUNT_PATH="/media/jeff/CIRCUITPY"
-FILES=("code.py" "boot.py" "macro.txt" "USAGE.txt" "README.md")
+FILES=("code.py" "boot.py" "macro.txt" "keepalive.txt" "config.yaml" "USAGE.txt" "README.md")
 
 if [ ! -d "$MOUNT_PATH" ]; then
     echo "❌ Error: CIRCUITPY device not found at $MOUNT_PATH"
