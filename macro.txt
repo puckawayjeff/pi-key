@@ -1,1 +1,1 @@
-thislongstringrighthere!
+thislongstringrighthere!{ENTER}

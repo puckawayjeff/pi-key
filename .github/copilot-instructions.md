@@ -17,12 +17,22 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Single-b
 ## Development Workflow
 
 ### Entering Edit Mode
-Device runs in stealth mode (no USB drive) by default. To edit:
+Device runs in stealth mode (no USB drive) by default. To access CIRCUITPY drive:
 1. Unplug device
 2. Hold button (GP29)
 3. Plug in while holding button
 4. Release after 1 second
 5. CIRCUITPY drive appears at `/media/jeff/CIRCUITPY`
+
+**User Workflow** (macro.txt only):
+- Enter edit mode → Edit `macro.txt` → Save → Unplug
+- No Python knowledge required
+- Works in any text editor
+
+**Developer Workflow** (code changes):
+- Enter edit mode → Run `./deploy.sh` → Monitor serial console
+- Requires CircuitPython knowledge
+- Use `./monitor.sh` for debugging
 
 ### Deploy Code
 ```bash
@@ -123,29 +133,33 @@ Install from CircuitPython Bundle:
 1. Download bundle: https://circuitpython.org/libraries
 2. Extract and copy `adafruit_hid/` folder to `/media/jeff/CIRCUITPY/lib/`
 
-## Common Macros
+## Macro File Syntax
 
-### Single Keys
-```python
-kbd.send(Keycode.T)  # Letter T
-kbd.send(Keycode.ENTER)
-kbd.send(Keycode.SPACE)
+Users edit `macro.txt` using `{KEY}` syntax for special keys:
+
+### User-Facing Examples
+```
+Plain text                              → Types text
+Username{TAB}Password{ENTER}            → Form auto-fill
+{CTRL+C}                                → Copy
+{CTRL+SHIFT+T}                          → Reopen browser tab
+{GUI+D}                                 → Show desktop
+Hello{ENTER}World                       → Multi-line
+Python {{dict}}                         → Types "Python {dict}" (literal braces)
 ```
 
-### Modifier Combinations
-```python
-kbd.send(Keycode.CONTROL, Keycode.C)  # Ctrl+C
-kbd.send(Keycode.CONTROL, Keycode.SHIFT, Keycode.T)  # Ctrl+Shift+T
-kbd.send(Keycode.ALT, Keycode.TAB)  # Alt+Tab
-kbd.send(Keycode.GUI, Keycode.D)  # Super/Windows+D
-```
+### Special Keys Available
+- Navigation: `{UP}`, `{DOWN}`, `{LEFT}`, `{RIGHT}`, `{HOME}`, `{END}`, `{PAGEUP}`, `{PAGEDOWN}`
+- Editing: `{ENTER}`, `{TAB}`, `{SPACE}`, `{BACKSPACE}`, `{DELETE}`, `{ESC}`
+- Modifiers: `{CTRL+...}`, `{SHIFT+...}`, `{ALT+...}`, `{GUI+...}`
 
-### Typing Strings
+### Implementation (Code Level)
 ```python
-layout = KeyboardLayout(kbd)
-layout.write("Hello World!")
+kbd.send(Keycode.ENTER)                      # Single key
+kbd.send(Keycode.CONTROL, Keycode.C)         # Ctrl+C
+layout.write("text")                         # Plain text
+parse_and_type_macro(MACRO_STRING)           # Parse {KEY} syntax
 ```
-Note: Requires `from adafruit_hid.keyboard_layout_us import KeyboardLayoutUS`
 
 ## Debugging
 

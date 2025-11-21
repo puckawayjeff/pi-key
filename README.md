@@ -35,7 +35,74 @@ To access the CIRCUITPY drive for editing:
 
 This is controlled by `boot.py` which checks the button state at boot time.
 
-## Quick Start
+## Macro Syntax
+
+The `macro.txt` file supports both plain text and special keyboard commands using `{KEY}` syntax:
+
+**Plain Text:**
+```
+Hello World
+```
+
+**Special Keys:**
+```
+Username{TAB}Password{ENTER}
+```
+
+**Key Combinations:**
+```
+{CTRL+C}          Copy
+{CTRL+V}          Paste
+{CTRL+SHIFT+T}    Reopen browser tab
+{GUI+D}           Show desktop
+```
+
+**Available Special Keys:**
+- Navigation: `{UP}`, `{DOWN}`, `{LEFT}`, `{RIGHT}`, `{HOME}`, `{END}`, `{PAGEUP}`, `{PAGEDOWN}`
+- Editing: `{ENTER}`, `{TAB}`, `{SPACE}`, `{BACKSPACE}`, `{DELETE}`, `{ESC}`
+
+**Available Modifiers:**
+- `{CTRL+...}` - Control key
+- `{SHIFT+...}` - Shift key
+- `{ALT+...}` - Alt key
+- `{GUI+...}` or `{WIN+...}` or `{CMD+...}` - Windows/Super/Command key
+
+You can combine multiple modifiers: `{CTRL+SHIFT+KEY}`
+
+**Literal Braces:**
+To type literal `{` or `}` characters, use double braces:
+```
+{{     Types a single {
+}}     Types a single }
+```
+Example: `Python {{dict}}` types `Python {dict}`
+
+## Quick Start (Users)
+
+If the device is already programmed, you can customize the macro without any programming:
+
+### Edit the Macro
+
+1. **Unplug** the device
+2. **Hold** the button down
+3. **Plug in** the device while holding
+4. **Release** after 1 second
+5. The `CIRCUITPY` drive will appear
+6. **Edit** `macro.txt` with any text editor
+7. **Save** the file
+8. **Unplug** the device (or press Ctrl+D in serial console to reload)
+
+The device is now ready with your custom macro!
+
+### Usage
+
+- **Double-tap button**: Purple flash → Types your macro
+- **Hold button 1+ seconds**: Amber breathing → Keep-alive mode active
+- **Press during keep-alive**: Two red flashes → Exits keep-alive mode
+
+## Developer Setup
+
+For initial setup or code development:
 
 ### 1. Install CircuitPython
 
@@ -46,9 +113,10 @@ Download CircuitPython 9.x for Waveshare RP2040-One from https://circuitpython.o
 Device needs `adafruit_hid` and `neopixel` in `/lib/` folder:
 
 ```bash
-# Libraries already configured if using provided bundle
-ls /media/jeff/CIRCUITPY/lib/
-# Should show: adafruit_hid/ and neopixel.mpy
+# Download CircuitPython 9.x bundle
+# Extract and copy these to /media/jeff/CIRCUITPY/lib/:
+# - adafruit_hid/ (directory)
+# - neopixel.mpy (file)
 ```
 
 ### 3. Deploy Code
@@ -60,22 +128,12 @@ ls /media/jeff/CIRCUITPY/lib/
 
 **Note**: After first deployment with `boot.py`, you must use edit mode (hold button during boot) to access the drive for updates.
 
-### 4. Customize Macro
-
-Edit `macro.txt` to change the string that gets typed on double-press, then redeploy.
-
-### 5. Monitor (Optional)
+### 4. Monitor Serial Console (Optional)
 
 ```bash
-./monitor.sh  # View serial console output
+./monitor.sh  # View serial console output (only in edit mode)
 # Press Ctrl+C to exit
 ```
-
-## Usage
-
-- **Double-tap button**: Purple flash → Types macro string
-- **Hold button 1+ seconds**: Amber breathing → Keep-alive mode active
-- **Press during keep-alive**: Two red flashes → Exits keep-alive mode
 
 ## Development
 

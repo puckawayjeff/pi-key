@@ -22,7 +22,7 @@ NEOPIXEL_PIN = board.GP16  # WS2812 RGB LED (GRB color order)
 MACRO_FILE = "macro.txt"  # Text file containing string to type
 
 # --- Timing Constants (in seconds) ---
-DOUBLE_PRESS_GAP = 0.3  # Max time between clicks for double-press
+DOUBLE_PRESS_GAP = 0.5  # Max time between clicks for double-press
 LONG_PRESS_DURATION = 1.0  # Hold duration to trigger keep-alive
 KEEP_ALIVE_MIN = 0.8  # Minimum interval between keep-alive keystrokes
 KEEP_ALIVE_MAX = 2.0  # Maximum interval between keep-alive keystrokes
@@ -35,6 +35,35 @@ try:
 except Exception as e:
     print(f"Error loading {MACRO_FILE}: {e}")
     MACRO_STRING = "fallback-text"
+
+# --- Special Key Mapping ---
+# Maps {KEY} patterns to Keycode constants
+SPECIAL_KEYS = {
+    "ENTER": Keycode.ENTER,
+    "TAB": Keycode.TAB,
+    "SPACE": Keycode.SPACE,
+    "BACKSPACE": Keycode.BACKSPACE,
+    "DELETE": Keycode.DELETE,
+    "ESC": Keycode.ESCAPE,
+    "UP": Keycode.UP_ARROW,
+    "DOWN": Keycode.DOWN_ARROW,
+    "LEFT": Keycode.LEFT_ARROW,
+    "RIGHT": Keycode.RIGHT_ARROW,
+    "HOME": Keycode.HOME,
+    "END": Keycode.END,
+    "PAGEUP": Keycode.PAGE_UP,
+    "PAGEDOWN": Keycode.PAGE_DOWN,
+}
+
+# Maps modifier names to Keycode constants
+MODIFIERS = {
+    "CTRL": Keycode.CONTROL,
+    "SHIFT": Keycode.SHIFT,
+    "ALT": Keycode.ALT,
+    "GUI": Keycode.GUI,  # Windows/Super/Command key
+    "WIN": Keycode.GUI,
+    "CMD": Keycode.GUI,
+}
 
 # --- Hardware Initialization ---
 # USB HID keyboard
@@ -69,6 +98,86 @@ next_keep_alive_delay = 0  # Randomized delay for next keystroke
 # --- LED Breathing Animation State ---
 breathe_brightness = 0  # Current brightness (0-127)
 breathe_direction = 1  # 1=brightening, -1=dimming
+
+
+def parse_and_type_macro(macro_string):
+    """Parse macro string and type it, handling special key sequences.
+    
+    Supports:
+    - Plain text: "hello world"
+    - Special keys: "text{ENTER}" or "{TAB}more text"
+    - Modifiers: "{CTRL+C}" or "{SHIFT+TAB}"
+    - Multiple modifiers: "{CTRL+SHIFT+T}"
+    - Literal braces: "{{" for { and "}}" for }
+    
+    Special keys are wrapped in curly braces: {KEYNAME}
+    Modifiers use + to combine: {MOD+KEY}
+    """
+    i = 0
+    while i < len(macro_string):
+        # Check for escaped literal braces
+        if i < len(macro_string) - 1:
+            if macro_string[i:i+2] == '{{':
+                layout.write('{')
+                i += 2
+                continue
+            elif macro_string[i:i+2] == '}}':
+                layout.write('}')
+                i += 2
+                continue
+        
+        # Check for special key sequence
+        if macro_string[i] == '{':
+            # Find closing brace
+            close_idx = macro_string.find('}', i)
+            if close_idx == -1:
+                # No closing brace, treat as literal
+                layout.write(macro_string[i])
+                i += 1
+                continue
+            
+            # Extract key sequence
+            key_seq = macro_string[i+1:close_idx].upper()
+            
+            # Check for modifier+key combination
+            if '+' in key_seq:
+                parts = key_seq.split('+')
+                modifiers = []
+                key = None
+                
+                # Parse modifiers and key
+                for part in parts:
+                    part = part.strip()
+                    if part in MODIFIERS:
+                        modifiers.append(MODIFIERS[part])
+                    elif part in SPECIAL_KEYS:
+                        key = SPECIAL_KEYS[part]
+                    else:
+                        # Try as single character
+                        if len(part) == 1:
+                            key = getattr(Keycode, part, None)
+                
+                # Send modifier combination
+                if key and modifiers:
+                    kbd.send(*modifiers, key)
+                elif key:
+                    kbd.send(key)
+                else:
+                    # Invalid sequence, type it literally
+                    layout.write(macro_string[i:close_idx+1])
+            
+            # Single special key
+            elif key_seq in SPECIAL_KEYS:
+                kbd.send(SPECIAL_KEYS[key_seq])
+            else:
+                # Unknown key, type literally
+                layout.write(macro_string[i:close_idx+1])
+            
+            i = close_idx + 1
+        else:
+            # Regular character, type it
+            layout.write(macro_string[i])
+            i += 1
 
 
 def purple_flash():
@@ -175,27 +284,28 @@ while True:
         
         # Button just released (active-low: False→True)
         else:
-            press_duration = current_time - press_start_time
-            print(f"Button released ({press_duration:.2f}s)")
-            
-            # Long press: activate keep-alive mode
-            if (press_duration >= LONG_PRESS_DURATION and
-                    not keep_alive_active):
-                print("Long press - activating keep-alive")
-                keep_alive_active = True
-                last_keep_alive_time = current_time
-                # Set initial random delay
-                next_keep_alive_delay = random.uniform(KEEP_ALIVE_MIN,
-                                                       KEEP_ALIVE_MAX)
-                click_count = 0  # Clear pending clicks
+            print(f"Button released ({current_time - press_start_time:.2f}s)")
+    
+    # Long press detection: check while button is held
+    if (not button_reading and not keep_alive_active and
+            press_start_time > 0 and
+            (current_time - press_start_time) >= LONG_PRESS_DURATION):
+        print("Long press - activating keep-alive")
+        keep_alive_active = True
+        last_keep_alive_time = current_time
+        # Set initial random delay
+        next_keep_alive_delay = random.uniform(KEEP_ALIVE_MIN,
+                                               KEEP_ALIVE_MAX)
+        click_count = 0  # Clear pending clicks
+        press_start_time = 0  # Prevent re-triggering
     
     # Double-press detection: check if timeout expired
     if (click_count > 0 and
             (current_time - last_click_time) > DOUBLE_PRESS_GAP):
         if click_count == 2 and not keep_alive_active:
             print("Double press - typing macro")
-            purple_flash()
-            layout.write(MACRO_STRING)
+            parse_and_type_macro(MACRO_STRING)  # Parse and type
+            purple_flash()  # Then show animation
         click_count = 0  # Reset for next detection
     
     # Keep-alive: send alternating keystrokes at random intervals

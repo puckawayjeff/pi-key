@@ -1,0 +1,115 @@
+===============================================================================
+                         PI-KEY USAGE GUIDE
+===============================================================================
+
+QUICK START
+-----------
+1. Double-tap the button quickly to type your macro
+2. Hold the button for 1+ seconds to activate keep-alive mode
+3. Press the button again to exit keep-alive mode
+
+
+EDITING YOUR MACRO
+------------------
+To change what gets typed when you double-tap:
+
+1. UNPLUG the device
+2. HOLD the button down
+3. PLUG IN the device while holding the button
+4. RELEASE the button after 1 second
+5. The CIRCUITPY drive will appear on your computer
+6. Open macro.txt in any text editor
+7. Edit the text and SAVE the file
+8. UNPLUG the device (it's ready to use!)
+
+
+MACRO SYNTAX
+------------
+You can type plain text OR use special keyboard commands with {KEY} syntax:
+
+PLAIN TEXT:
+  Hello World
+
+SPECIAL KEYS:
+  Username{TAB}Password{ENTER}
+  
+  Types "Username", presses Tab, types "Password", presses Enter
+
+KEY COMBINATIONS:
+  {CTRL+C}          Copy selected text
+  {CTRL+V}          Paste
+  {CTRL+SHIFT+T}    Reopen closed browser tab
+  {GUI+D}           Show desktop (Windows key + D)
+  {ALT+TAB}         Switch windows
+
+
+AVAILABLE SPECIAL KEYS
+----------------------
+Navigation:
+  {UP}        {DOWN}      {LEFT}      {RIGHT}
+  {HOME}      {END}       {PAGEUP}    {PAGEDOWN}
+
+Editing:
+  {ENTER}     {TAB}       {SPACE}     {BACKSPACE}
+  {DELETE}    {ESC}
+
+Modifiers (combine with other keys):
+  {CTRL+...}    Control key
+  {SHIFT+...}   Shift key
+  {ALT+...}     Alt key
+  {GUI+...}     Windows/Command/Super key
+  {WIN+...}     Same as GUI (Windows key)
+  {CMD+...}     Same as GUI (Command key on Mac)
+
+You can combine multiple modifiers:
+  {CTRL+SHIFT+T}
+  {CTRL+ALT+DELETE}
+
+
+EXAMPLE MACROS
+--------------
+Login to a website:
+  myusername{TAB}mypassword{ENTER}
+
+Fill out a form:
+  John Smith{TAB}john@example.com{TAB}555-1234{ENTER}
+
+Type multiple lines:
+  Line 1{ENTER}Line 2{ENTER}Line 3
+
+Open Task Manager (Windows):
+  {CTRL+SHIFT+ESC}
+
+Copy something and paste it twice:
+  {CTRL+C}{CTRL+V}{CTRL+V}
+
+Navigate and select text:
+  {CTRL+HOME}{CTRL+SHIFT+END}
+
+
+LED INDICATORS
+--------------
+Purple flash:         Macro is being typed
+Amber breathing:      Keep-alive mode active (types spacebar every 0.8-2.0s)
+Two red flashes:      Keep-alive mode exited
+
+
+TROUBLESHOOTING
+---------------
+Q: The drive doesn't appear when I plug it in
+A: Hold the button WHILE plugging in the device, then release after 1 second
+
+Q: My macro doesn't work
+A: Check that special keys are wrapped in {BRACES} with correct spelling
+
+Q: How do I type a literal { or } character?
+A: Use double braces: {{ for { and }} for }
+   Example: To type "Python {dict}", use: Python {{dict}}
+
+Q: The device types random spaces
+A: That's keep-alive mode! Press the button once to exit it
+
+
+===============================================================================
+For more information, visit: https://github.com/puckawayjeff/pi-key
+===============================================================================
