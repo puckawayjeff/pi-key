@@ -2,6 +2,8 @@
 
 USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types keyboard sequences and provides keep-alive functionality via a single button.
 
+![A photo of the device in a 3D-printed enclosure, plugged into a laptop](https://www.puckaway.org/pi-key/key-with-enclosure.jpg)
+
 ## Features
 
 - **Double-Press**: Types customizable macro string (from `macro.txt`)
@@ -10,6 +12,8 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types ke
 - **Visual Feedback**: RGB LED indicates actions (purple=typing, amber=keep-alive, red=exit)
 
 ## Hardware
+
+![A photo of the Waveshare RP2040-One with pushbutton attached](https://www.puckaway.org/pi-key/board-and-button.jpg)
 
 - **Board**: Waveshare RP2040-One
 - **Button**: Momentary pushbutton between GP29 and GND (internal pull-up)
