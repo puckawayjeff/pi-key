@@ -85,8 +85,8 @@ def parse_config():
         return {
             "manufacturer": config.get("usb_manufacturer", "Generic"),
             "product": config.get("usb_product", "USB Keyboard"),
-            "vid": int(config.get("usb_vid", "0x1234"), 16) if config.get("usb_vid") else 0x1234,
-            "pid": int(config.get("usb_pid", "0x5678"), 16) if config.get("usb_pid") else 0x5678,
+            "vid": int(config.get("usb_vid", "0x1234"), 16),
+            "pid": int(config.get("usb_pid", "0x5678"), 16),
         }
     else:
         # Use preset (default to dell_kb216 if invalid)

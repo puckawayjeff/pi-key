@@ -67,7 +67,7 @@ def parse_hex_color(hex_str):
         b = int(hex_str[4:6], 16)
         return (g, r, b)  # Convert RGB to GRB
     else:
-        raise ValueError("Invalid hex color format")
+        raise ValueError("Invalid hex color format. Expected 6-character hex string (e.g., FF00FF or #FF00FF)")
 
 def parse_color(color_str):
     """Parse color string (hex or named color) to GRB tuple.
@@ -87,7 +87,7 @@ def parse_color(color_str):
     # Try to parse as hex
     try:
         return parse_hex_color(color_str)
-    except:
+    except ValueError:
         # Return default purple if parsing fails
         return DEFAULT_MACRO_COLOR
 
