@@ -3,8 +3,9 @@
 Features:
 - Double-press: Types macro string from macro.txt file
 - Long-press (1+ sec): Activates keep-alive mode (prevents screen lock)
-- Keep-alive: Alternates Space and Left-Arrow keypresses at random intervals
+- Keep-alive: Sends programmable keystroke sequence from keepalive.txt at random intervals
 - Visual feedback via WS2812 RGB LED
+- Fully configurable via config.yaml (timing, colors, USB identity)
 """
 import time
 import board
