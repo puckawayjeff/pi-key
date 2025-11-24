@@ -1,1 +1,1 @@
-{SPACE}{LEFT_ARROW}
+{F15}

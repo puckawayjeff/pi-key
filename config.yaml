@@ -15,14 +15,14 @@ usb_preset: dell_kb216
 
 # === Timing Settings (in seconds) ===
 # Time window for detecting double-press
-double_press_gap: 0.5
+double_press_gap: 0.6
 
 # How long to hold button to activate keep-alive
-long_press_duration: 1.0
+long_press_duration: 2.0
 
 # Random interval between keep-alive keystrokes
 keep_alive_min: 0.8
-keep_alive_max: 2.0
+keep_alive_max: 8.0
 
 # === LED Colors ===
 # Colors can be hex codes (e.g., #FF00FF) or named colors

@@ -56,6 +56,10 @@ Editing:
   {ENTER}     {TAB}       {SPACE}     {BACKSPACE}
   {DELETE}    {ESC}
 
+Function Keys:
+  {F1}  {F2}  {F3}  {F4}  {F5}  {F6}  {F7}  {F8}
+  {F9}  {F10} {F11} {F12} {F13} {F14} {F15}
+
 Modifiers (combine with other keys):
   {CTRL+...}    Control key
   {SHIFT+...}   Shift key
@@ -88,6 +92,15 @@ Copy something and paste it twice:
 
 Navigate and select text:
   {CTRL+HOME}{CTRL+SHIFT+END}
+
+Refresh browser:
+  {F5}
+
+Open DevTools (browser):
+  {F12}
+
+Rename file (Windows):
+  {F2}
 
 
 LED INDICATORS

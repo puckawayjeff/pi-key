@@ -96,6 +96,7 @@ Username{TAB}Password{ENTER}
 **Available Special Keys:**
 - Navigation: `{UP}`, `{DOWN}`, `{LEFT}`, `{RIGHT}`, `{HOME}`, `{END}`, `{PAGEUP}`, `{PAGEDOWN}`
 - Editing: `{ENTER}`, `{TAB}`, `{SPACE}`, `{BACKSPACE}`, `{DELETE}`, `{ESC}`
+- Function Keys: `{F1}` through `{F15}`
 
 **Available Modifiers:**
 - `{CTRL+...}` - Control key

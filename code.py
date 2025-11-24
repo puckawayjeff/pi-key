@@ -194,6 +194,21 @@ SPECIAL_KEYS = {
     "END": Keycode.END,
     "PAGEUP": Keycode.PAGE_UP,
     "PAGEDOWN": Keycode.PAGE_DOWN,
+    "F1": Keycode.F1,
+    "F2": Keycode.F2,
+    "F3": Keycode.F3,
+    "F4": Keycode.F4,
+    "F5": Keycode.F5,
+    "F6": Keycode.F6,
+    "F7": Keycode.F7,
+    "F8": Keycode.F8,
+    "F9": Keycode.F9,
+    "F10": Keycode.F10,
+    "F11": Keycode.F11,
+    "F12": Keycode.F12,
+    "F13": Keycode.F13,
+    "F14": Keycode.F14,
+    "F15": Keycode.F15,
 }
 
 # Maps modifier names to Keycode constants
