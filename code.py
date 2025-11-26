@@ -26,6 +26,7 @@ CONFIG_FILE = "config.yaml"  # Configuration file
 
 # --- Default Values ---
 # These are used if config file is missing or invalid
+DEFAULT_BUTTON_TYPE = "mechanical"  # mechanical (active-low) or capacitive (active-high)
 DEFAULT_DOUBLE_PRESS_GAP = 0.5  # Max time between clicks for double-press
 DEFAULT_LONG_PRESS_DURATION = 1.0  # Hold duration to trigger keep-alive
 DEFAULT_KEEP_ALIVE_MIN = 0.8  # Minimum interval between keep-alive keystrokes
@@ -98,6 +99,7 @@ def parse_config():
     Falls back to defaults if config missing or invalid.
     """
     config = {
+        "button_type": DEFAULT_BUTTON_TYPE,
         "double_press_gap": DEFAULT_DOUBLE_PRESS_GAP,
         "long_press_duration": DEFAULT_LONG_PRESS_DURATION,
         "keep_alive_min": DEFAULT_KEEP_ALIVE_MIN,
@@ -125,8 +127,12 @@ def parse_config():
                     if "#" in value:
                         value = value.split("#")[0].strip()
                     
+                    # Parse button type
+                    if key == "button_type":
+                        if value.lower() in ["mechanical", "capacitive"]:
+                            config["button_type"] = value.lower()
                     # Parse timing values
-                    if key == "double_press_gap":
+                    elif key == "double_press_gap":
                         config["double_press_gap"] = float(value)
                     elif key == "long_press_duration":
                         config["long_press_duration"] = float(value)
@@ -148,6 +154,7 @@ def parse_config():
 
 # --- Load Configuration ---
 config = parse_config()
+BUTTON_TYPE = config["button_type"]
 DOUBLE_PRESS_GAP = config["double_press_gap"]
 LONG_PRESS_DURATION = config["long_press_duration"]
 KEEP_ALIVE_MIN = config["keep_alive_min"]
@@ -156,7 +163,7 @@ MACRO_COLOR = config["macro_color"]
 KEEPALIVE_COLOR = config["keepalive_color"]
 CANCEL_COLOR = config["cancel_color"]
 
-print(f"Config loaded: gap={DOUBLE_PRESS_GAP}s, long={LONG_PRESS_DURATION}s, "
+print(f"Config loaded: button={BUTTON_TYPE}, gap={DOUBLE_PRESS_GAP}s, long={LONG_PRESS_DURATION}s, "
       f"keepalive={KEEP_ALIVE_MIN}-{KEEP_ALIVE_MAX}s")
 
 # --- Load Macro String from File ---
@@ -238,6 +245,24 @@ pixel = neopixel.NeoPixel(
 )
 pixel.fill((0, 0, 0))
 pixel.show()
+
+# --- Button Logic ---
+def read_button():
+    """Read button state with logic inversion for capacitive sensors.
+    
+    Returns:
+        bool: True if button is released, False if pressed
+              (normalized to active-low logic regardless of sensor type)
+    """
+    raw_value = btn.value
+    if BUTTON_TYPE == "capacitive":
+        # Capacitive sensors in AB=00 mode output HIGH when touched
+        # Invert so pressed=False (active-low, like mechanical)
+        return not raw_value
+    else:
+        # Mechanical switches are active-low by default
+        # Released=HIGH (True), Pressed=LOW (False)
+        return raw_value
 
 # --- Button State Tracking ---
 last_button_state = True  # Button starts released
@@ -420,7 +445,7 @@ print("- Long-press: Activate keep-alive mode")
 
 while True:
     current_time = time.monotonic()
-    button_reading = btn.value  # True=released, False=pressed
+    button_reading = read_button()  # True=released, False=pressed
     
     # Update breathing LED animation if in keep-alive mode
     if keep_alive_active:

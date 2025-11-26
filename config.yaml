@@ -2,6 +2,11 @@
 # Edit this file to customize device behavior without modifying Python code
 # Lines starting with # are comments and will be ignored
 
+# === Button Type ===
+# mechanical: Standard momentary switches (active-low, default)
+# capacitive: TTP223 capacitive touch sensors in default AB=00 configuration (active-high)
+button_type: mechanical
+
 # === USB Device Settings (Stealth Mode) ===
 # Choose a preset or set 'custom' to define your own values
 # Available presets: dell_kb216, logitech_k120, hp_km100, microsoft_600, apple_keyboard

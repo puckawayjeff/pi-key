@@ -116,6 +116,16 @@ CONFIGURATION FILE (config.yaml)
 --------------------------------
 The config.yaml file lets you customize device behavior without editing Python code.
 
+BUTTON TYPE:
+  button_type: mechanical         # Type of button hardware
+  
+  Available types:
+    - mechanical: Standard momentary pushbuttons (default)
+    - capacitive: TTP223 capacitive touch sensors
+  
+  Use 'capacitive' if using TTP223 touch sensors in factory AB=00 configuration.
+  Use 'mechanical' for traditional pushbuttons.
+
 TIMING SETTINGS:
   double_press_gap: 0.5       # Time window for double-press (seconds)
   long_press_duration: 1.0    # Hold time to activate keep-alive (seconds)

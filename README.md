@@ -17,7 +17,9 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Types ke
 ![A photo of the Waveshare RP2040-One with pushbutton attached](https://www.puckaway.org/pi-key/board-and-button.jpg)
 
 - **Board**: Waveshare RP2040-One
-- **Button**: Momentary pushbutton between GP29 and GND (internal pull-up)
+- **Button**: Either:
+  - Momentary pushbutton between GP29 and GND (internal pull-up) - set `button_type: mechanical` in config.yaml
+  - TTP223 capacitive touch sensor (VCC to 3.3V, GND to GND, I/O to GP29) - set `button_type: capacitive` in config.yaml
 - **LED**: Onboard WS2812 RGB LED on GP16 (GRB color order)
 
 ## Configuration
@@ -27,6 +29,11 @@ The device is fully configurable without modifying any Python code. All settings
 ### config.yaml
 
 Controls device behavior and appearance:
+
+**Button Type**
+- `button_type`: Specify button hardware type
+  - `mechanical` (default): Standard momentary pushbuttons (active-low)
+  - `capacitive`: TTP223 capacitive touch sensors in default AB=00 configuration (active-high)
 
 **USB Device Identity (Stealth Mode)**
 - Choose from preset keyboards: `dell_kb216` (default), `logitech_k120`, `hp_km100`, `microsoft_600`, `apple_keyboard`
@@ -150,13 +157,27 @@ Download CircuitPython 10.x for Waveshare RP2040-One from <https://circuitpython
 
 ### 2. Install Required Libraries
 
-Device needs `adafruit_hid` and `neopixel` in `/lib/` folder:
+Device needs `adafruit_hid` and `neopixel` in `/lib/` folder.
 
+**Automatic Installation (Recommended):**
 ```bash
-# Download CircuitPython 10.x bundle
-# Extract and copy these to /media/jeff/CIRCUITPY/lib/:
-# - adafruit_hid/ (directory)
-# - neopixel.mpy (file)
+./install_libs.sh  # Automatically downloads and installs required libraries
+```
+
+**Manual Installation:**
+
+Download the CircuitPython 10.x library bundle:
+- **Direct Link**: <https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/download/20241125/adafruit-circuitpython-bundle-10.x-mpy-20241125.zip>
+- **Latest Release**: <https://github.com/adafruit/Adafruit_CircuitPython_Bundle/releases/latest>
+
+Extract and copy these to `/media/jeff/CIRCUITPY/lib/`:
+- `adafruit_hid/` (directory)
+- `neopixel.mpy` (file)
+
+**Verify Installation:**
+```bash
+ls -lh /media/jeff/CIRCUITPY/lib/
+# Should show adafruit_hid/ folder and neopixel.mpy with size > 0 bytes
 ```
 
 ### 3. Deploy Code
@@ -205,8 +226,14 @@ archive/         # Historical Arduino experiments
 ## Hardware Notes
 
 - **GP16**: WS2812 LED (GRB color order, not RGB!)
-- **GP29**: Button input with internal pull-up (active-low)
-- Button wiring: GP29 → momentary switch → GND
+- **GP29**: Button input with internal pull-up (active-low for mechanical, active-high for capacitive)
+- **Mechanical button wiring**: GP29 → momentary switch → GND
+- **Capacitive sensor wiring**: 
+  - VCC → 3.3V power
+  - GND → Ground
+  - I/O (or OUT) → GP29
+  - Factory default AB=00 configuration (no soldering needed)
+  - Set `button_type: capacitive` in config.yaml
 
 ## Stealth Mode Details
 
@@ -216,3 +243,60 @@ The `boot.py` file configures USB behavior at boot time:
 - **Edit mode** (button pressed during boot): Full CIRCUITPY drive access enabled
 
 This allows the device to operate covertly while still being field-updatable without requiring BOOTSEL mode.
+
+## Troubleshooting
+
+### LED Blink Codes (Error Indicators)
+
+If the device shows unusual LED blinking patterns instead of normal operation, CircuitPython is reporting an error:
+
+**Common Patterns:**
+- **Green/Red alternating flashes**: Import error (missing or corrupted libraries)
+- **Rapid red flashes**: Syntax error in code
+- **No LED activity**: Code running but hardware issue (button or LED)
+
+**Most Common Issue: Missing/Corrupted Libraries**
+
+If you see error blink codes on a newly setup device:
+
+1. **Enter edit mode** (hold button during boot)
+2. **Check libraries**:
+   ```bash
+   ls -lh /media/jeff/CIRCUITPY/lib/
+   ```
+3. **Look for problems**:
+   - Missing `adafruit_hid/` folder
+   - Missing `neopixel.mpy` file
+   - **`neopixel.mpy` showing 0 bytes** ← Most common!
+4. **Reinstall libraries**:
+   ```bash
+   ./install_libs.sh
+   ```
+5. **Unplug and replug** device
+
+**View Error Details:**
+
+Connect to serial console in edit mode:
+```bash
+./monitor.sh
+# Or manually:
+screen /dev/ttyACM0 115200
+```
+
+Press Ctrl+D to reload code and see the actual error message.
+
+### Device Not Appearing
+
+**Problem**: CIRCUITPY drive doesn't appear when plugged in
+
+**Solution**: Enter edit mode by holding button during boot (see "Entering Edit Mode" above)
+
+### Code Not Running
+
+**Problem**: Device appears but code doesn't run
+
+**Checklist**:
+1. Verify `code.py` exists on device
+2. Check for syntax errors: `python3 -m py_compile code.py`
+3. Verify libraries installed correctly
+4. Check serial console for error messages

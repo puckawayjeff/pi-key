@@ -10,9 +10,12 @@ USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Single-b
   - `boot.py` - Boot-time USB configuration (stealth mode)
 - **USB Behavior**: Device operates in stealth mode by default (no drive, no serial port)
 - **Hardware**: 
-  - Button: GP29 with internal pull-up (active-low)
+  - Button: GP29 with internal pull-up (configurable for mechanical or capacitive sensors)
+  - Mechanical: active-low (pressed = LOW, released = HIGH)
+  - Capacitive (TTP223): active-high with software inversion (factory AB=00 configuration)
   - RGB LED: GP16 WS2812 (GRB color order, NOT RGB!)
 - **Libraries**: `adafruit_hid` (keyboard), `neopixel` (LED)
+- **Configuration**: `config.yaml` includes `button_type` setting for mechanical vs capacitive sensors
 
 ## Development Workflow
 
@@ -57,8 +60,17 @@ View `print()` statements and runtime errors. Press Ctrl+A then K to exit screen
 
 ### Button State Detection
 ```python
+# Use read_button() helper function for automatic logic inversion
+def read_button():
+    """Read button with logic inversion for capacitive sensors."""
+    raw_value = btn.value
+    if BUTTON_TYPE == "capacitive":
+        return not raw_value  # Invert for capacitive
+    else:
+        return raw_value  # Direct read for mechanical
+
 # Simple edge detection (no debounce library needed)
-button_reading = btn.value  # True=released, False=pressed
+button_reading = read_button()  # True=released, False=pressed
 if button_reading != last_button_state:
     last_button_state = button_reading
     if not button_reading:  # Just pressed
@@ -118,7 +130,18 @@ pixel.fill((191, 255, 0))  # Amber in GRB = (G=191, R=255, B=0)
 ```
 
 ### Button Wiring
+
+**Mechanical Switch (button_type: mechanical)**
 Connect momentary switch between GP29 and GND. Internal pull-up makes pin HIGH when released, LOW when pressed.
+
+**Capacitive Touch Sensor (button_type: capacitive)**
+TTP223 in factory AB=00 configuration:
+- VCC → 3.3V power
+- GND → Ground  
+- I/O (or OUT) → GP29
+- Factory default outputs HIGH when touched, LOW when not touched
+- Software automatically inverts logic to match mechanical behavior
+- No soldering of jumpers required
 
 ## Library Management
 
