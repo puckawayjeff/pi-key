@@ -4,7 +4,7 @@
 USB HID keyboard emulator for Waveshare RP2040-One using CircuitPython. Single-button interface with double-press macro typing and long-press keep-alive mode.
 
 ## Architecture
-- **Platform**: CircuitPython 9.x on Waveshare RP2040-One
+- **Platform**: CircuitPython 10.x on Waveshare RP2040-One
 - **Main files**: 
   - `code.py` - Main application logic
   - `boot.py` - Boot-time USB configuration (stealth mode)

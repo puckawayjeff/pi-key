@@ -146,14 +146,14 @@ For initial setup or code development:
 
 ### 1. Install CircuitPython
 
-Download CircuitPython 9.x for Waveshare RP2040-One from https://circuitpython.org/downloads
+Download CircuitPython 10.x for Waveshare RP2040-One from <https://circuitpython.org/board/waveshare_rp2040_one/>
 
 ### 2. Install Required Libraries
 
 Device needs `adafruit_hid` and `neopixel` in `/lib/` folder:
 
 ```bash
-# Download CircuitPython 9.x bundle
+# Download CircuitPython 10.x bundle
 # Extract and copy these to /media/jeff/CIRCUITPY/lib/:
 # - adafruit_hid/ (directory)
 # - neopixel.mpy (file)
@@ -197,7 +197,7 @@ archive/         # Historical Arduino experiments
 
 ## Dependencies
 
-**CircuitPython**: 9.x or 10.x  
+**CircuitPython**: 10.x
 **Libraries**:
 - `adafruit_hid` - USB HID keyboard emulation
 - `neopixel` - WS2812 RGB LED control
